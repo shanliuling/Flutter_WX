@@ -38,7 +38,7 @@ class _PostEditPageState extends State<PostEditPage> {
     );
   }
 
-  //添加按钮
+  //添加图片按钮
   GestureDetector _buildAddBtn(BuildContext context, double width) {
     return GestureDetector(
       onTap: () async {
