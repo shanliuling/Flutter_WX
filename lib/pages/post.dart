@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_wx/widgets/gallery.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../utils/config.dart';
@@ -46,8 +47,11 @@ class _PostEditPageState extends State<PostEditPage> {
           pickerConfig: AssetPickerConfig(
               selectedAssets: imageList, maxAssets: maxAssets), //图片已选和图片最大限制
         );
+        if (result == null) {
+          return;
+        }
         setState(() {
-          imageList = result ?? [];
+          imageList = result;
         });
       },
       child: Container(
@@ -66,18 +70,32 @@ class _PostEditPageState extends State<PostEditPage> {
   }
 
   //图片item
-  Container _buildPhotoItem(AssetEntity entity, double width) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: AssetEntityImage(
-        entity,
-        width: width,
-        height: width,
-        fit: BoxFit.cover,
-        isOriginal: true, //是否原图
+  Widget _buildPhotoItem(AssetEntity entity, double width) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            //引入图形浏览器
+            return GalleryWidget(
+              initialIndex: imageList.indexOf(entity), //选中为第几张图片
+              imageList: imageList, //这是引入,不是复制,复制要add什么的
+            );
+          }),
+        );
+      },
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: AssetEntityImage(
+          entity,
+          width: width,
+          height: width,
+          fit: BoxFit.cover,
+          isOriginal: true, //是否原图
+        ),
       ),
     );
   }
