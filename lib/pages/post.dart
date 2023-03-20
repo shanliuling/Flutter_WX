@@ -12,7 +12,7 @@ class PostEditPage extends StatefulWidget {
 }
 
 class _PostEditPageState extends State<PostEditPage> {
-  // 已选中图片列表
+  // 已选中图片的列表
   List<AssetEntity> imageList = [];
   //是否开启拖拽
   bool isDraggable = false;
