@@ -58,15 +58,15 @@ class _PostEditPageState extends State<PostEditPage> {
         });
       },
       child: Container(
+        width: width, //设置宽度为width
+        height: width,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(color: Colors.grey),
         ),
-        child: SizedBox(
-          width: width,
-          height: width,
-          child: const Icon(Icons.add),
+        child: const SizedBox(
+          child: Icon(Icons.add),
         ),
       ),
     );
@@ -89,6 +89,7 @@ class _PostEditPageState extends State<PostEditPage> {
           isDraggable = false;
         });
       },
+      //当 draggable 被放置并被 [DragTarget] 接受时调用。
       onDragCompleted: () {},
       feedback: Container(
         clipBehavior: Clip.antiAlias,
@@ -147,12 +148,53 @@ class _PostEditPageState extends State<PostEditPage> {
     );
   }
 
+  //删除bar
+  Widget _buildRemoveBar() {
+    //接受拖拽组件 DragTarget
+    return DragTarget<AssetEntity>(
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+            height: 100,
+            color: isWillDelete ? Colors.red[300] : Colors.red[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '删除',
+                  style: TextStyle(
+                      color: isWillDelete ? Colors.white : Colors.white70),
+                ),
+                Icon(Icons.delete,
+                    color: isWillDelete ? Colors.white : Colors.white70,
+                    size: 30),
+              ],
+            ));
+      },
+      onWillAccept: (data) {
+        setState(() {
+          isWillDelete = true;
+        });
+        return true;
+      },
+      onAccept: (data) => setState(() {
+        imageList.remove(data);
+        isWillDelete = false;
+      }),
+      onLeave: (data) {
+        setState(() {
+          isWillDelete = false;
+        });
+      },
+    );
+  }
+
   // 主视图
   Widget _mainView() {
     return Column(
       children: [
-        // 图片列表
         _buildImageList(),
+        // const Spacer(),
+        // isDraggable ? _buildRemoveBar() : const SizedBox.shrink(),
       ],
     );
   }
@@ -164,6 +206,7 @@ class _PostEditPageState extends State<PostEditPage> {
         title: const Text('发布动态'),
       ),
       body: _mainView(),
+      bottomSheet: isDraggable ? _buildRemoveBar() : null, //持久化底部,自带动画
     );
   }
 }
