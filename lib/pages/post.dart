@@ -14,7 +14,10 @@ class PostEditPage extends StatefulWidget {
 class _PostEditPageState extends State<PostEditPage> {
   // 已选中图片列表
   List<AssetEntity> imageList = [];
-
+  //是否开启拖拽
+  bool isDraggable = false;
+  // 是否将要删除
+  bool isWillDelete = false;
   // 图片列表
   Widget _buildImageList() {
     return Padding(
@@ -71,20 +74,23 @@ class _PostEditPageState extends State<PostEditPage> {
 
   //图片item
   Widget _buildPhotoItem(AssetEntity entity, double width) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) {
-            //引入图形浏览器
-            return GalleryWidget(
-              initialIndex: imageList.indexOf(entity), //选中为第几张图片
-              imageList: imageList, //这是引入,不是复制,复制要add什么的
-            );
-          }),
-        );
+    // Draggable 拖拽
+    return Draggable<AssetEntity>(
+      data: entity,
+      //当可拖动对象开始被拖动时调用。
+      onDragStarted: () {
+        setState(() {
+          isDraggable = true;
+        });
       },
-      child: Container(
+      //当可拖动对象被放下时调用。
+      onDragEnd: (details) {
+        setState(() {
+          isDraggable = false;
+        });
+      },
+      onDragCompleted: () {},
+      feedback: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
@@ -94,7 +100,48 @@ class _PostEditPageState extends State<PostEditPage> {
           width: width,
           height: width,
           fit: BoxFit.cover,
-          isOriginal: true, //是否原图
+          isOriginal: false, //是否原图
+        ),
+      ),
+      childWhenDragging: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: AssetEntityImage(
+          entity,
+          width: width,
+          height: width,
+          fit: BoxFit.cover,
+          isOriginal: false, //是否原图
+          opacity: const AlwaysStoppedAnimation(0.2), //透明度
+        ),
+      ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) {
+              //引入图形浏览器
+              return GalleryWidget(
+                initialIndex: imageList.indexOf(entity), //选中为第几张图片
+                imageList: imageList, //这是引入,不是复制,复制要add什么的
+              );
+            }),
+          );
+        },
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: AssetEntityImage(
+            entity,
+            width: width,
+            height: width,
+            fit: BoxFit.cover,
+            isOriginal: false, //是否原图
+          ),
         ),
       ),
     );

@@ -27,7 +27,6 @@ class _GalleryWidgetState extends State<GalleryWidget>
   @override
   void initState() {
     super.initState();
-
     visible = widget.isBarVisible ?? true;
     controller = AnimationController(
       vsync: this,
